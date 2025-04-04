@@ -16,13 +16,17 @@ func main() {
 	defer file.Close() // Ensure the file is closed after reading
 	fmt.Println("File opened successfully")
 
-	egyptMatches := getEgyptMatches()
+	fmt.Println("Enter the name of the team:")
+	var team string
+	fmt.Scanln(&team) // Read the team name from user input
 
-	fmt.Printf("Win percentage of Egypt: %.2f%%", getWinPercentage("Egypt", egyptMatches)) // Print the win percentage of Egypt
+	countryMatches := getCountryMatches(team)
+
+	fmt.Printf("Win percentage of %s: %.2f%%", team,getWinPercentage(team, countryMatches)) // Print the win percentage of Egypt
 }
 
 // This function will read the csv file and filter the matches related to Egypt 
-func getEgyptMatches() [][]string {
+func getCountryMatches(team string) [][]string {
 	file, err := os.Open("../Data/results.csv")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
@@ -36,38 +40,36 @@ func getEgyptMatches() [][]string {
 		fmt.Println("Error reading CSV records:", err)
 		return [][]string{}
 	}
-	egyptMatchDetails := [][]string{} // Initialize a slice to store match details
-	// Iterate through the records and filter matches related to Egypt
+	teamMatchDetails := [][]string{} // Initialize a slice to store match details
+	// Iterate through the records and filter matches related to team
 	for _, record := range records { 
-		if record[1] == "Egypt" || record[2] == "Egypt" {
-			egyptMatchDetails = append(egyptMatchDetails, record) // Append the record to the slice
+		if record[1] == team || record[2] == team {
+			teamMatchDetails = append(teamMatchDetails, record) // Append the record to the slice
 		}
 	}
 	
-	egyptMatchesCount := len(egyptMatchDetails) // Get the number of matches related to Egypt
+	teamMatchesCount := len(teamMatchDetails) // Get the number of matches related to team
 
-	fmt.Printf("Found %d matches related to Egypt\n", egyptMatchesCount)
+	fmt.Printf("Found %d matches related to %s\n", teamMatchesCount, team)
 
-	return egyptMatchDetails // Return the match details slice
+	return teamMatchDetails // Return the match details slice
 
 }
 
 // Function to get the win percentage of a team
 func getWinPercentage(team string, matches [][]string) float64 {
 	// This function will calculate the win percentage of a team based on the matches data
-	winCount := 0 // Initialize win count
-	drawCount := 0 // Initialize draw count
-	lossCount := 0 // Initialize loss count
+	winCount,drawCount,lossCount := 0,0,0 
 	totalMatches := len(matches) // Get the total number of matches
 
 	for _, match := range matches { // Iterate through the matches
 		// fmt.Println("Match details: ", match[0], " ", match[1], " ", match[2], " ",match[3], " ",match[4]) // Print the match details
 		if (match[1] == team && match[3] > match[4]) || (match[2] == team && match[3] < match[4]) { // Check if the team won
-			winCount++ // Increment win count
+			winCount++ 
 		} else if (match[1] == team && match[3] == match[4]) || (match[2] == team && match[3] == match[4]) { // Check if the match was a draw
-			drawCount++ // Increment draw count
+			drawCount++ 
 		} else if (match[1] == team && match[3] < match[4]) || (match[2] == team && match[3] > match[4]) { // Check if the team lost
-			lossCount++ // Increment loss count
+			lossCount++ 
 		}
 
 	}
